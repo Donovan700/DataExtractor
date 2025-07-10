@@ -1,62 +1,95 @@
 import tkinter as tk
+from tkinter import ttk
 from Extract import extract_data_from_xml
 
+# Création de la fenêtre principale
 fenetre = tk.Tk()
-fenetre.title("Data extractor")
-fenetre.geometry("1200x600")
+fenetre.title("Data Extractor")
+fenetre.geometry("1200x700")
+fenetre.configure(bg="#f4f4f4")
 
+# ---------- Fonctions ----------
 
-# Fonction à exécuter lorsque le bouton est cliqué
 def extract_me():
     try:
-        Data = extract_data_from_xml("test.xml")
-        # Affichez les données dans le label
+        data = extract_data_from_xml("test.xml")
         result_text = ""
-        for item in Data:
-            result_text += f"Produit : {item['id']}, Prix : {item['channelName']}, Type : {item['payloadType']}, Message : {item['messageType']}, Status : {item['status']}, Creation : {item['creationTime']}, Edited Date : {item['lastChange']}\n"
-        
-        result_label.config(text=result_text)
+        for item in data:
+            result_text += (
+                f"Produit : {item['id']}\n"
+                f"Prix : {item['channelName']}\n"
+                f"Type : {item['payloadType']}\n"
+                f"Message : {item['messageType']}\n"
+                f"Status : {item['status']}\n"
+                f"Création : {item['creationTime']}\n"
+                f"Dernière modification : {item['lastChange']}\n"
+                "----------------------------------------\n"
+            )
+        result_textbox.delete(1.0, tk.END)
+        result_textbox.insert(tk.END, result_text)
     except Exception as e:
-        print(e)
-        result_label.config(text=f"Erreur : {str(e)}")
+        result_textbox.delete(1.0, tk.END)
+        result_textbox.insert(tk.END, f"Erreur : {str(e)}")
 
-def quit():
-    try:
-        fenetre.quit()
-    except Exception as err:
-        print(err)
 
-def PrintText():
+def quit_app():
+    fenetre.quit()
+
+
+def print_text():
     try:
-        elem = Input.get("1.0", "end-1c")
-        result_label.config(text=str(elem))
+        elem = input_textbox.get("1.0", "end-1c")
+        result_textbox.delete(1.0, tk.END)
+        result_textbox.insert(tk.END, str(elem))
     except Exception as e:
-        print(e)
+        result_textbox.insert(tk.END, f"Erreur : {str(e)}")
 
-def ExtractIt():
+
+def extract_from_input():
     try:
-        InputText = Input.get("1.0","end-1c")
-        Data = extract_data_from_xml(InputText)
+        input_data = input_textbox.get("1.0", "end-1c")
+        data = extract_data_from_xml(input_data)
         result_text = ""
-        for item in Data:
-            result_text += f"Produit : {item['id']}, Prix : {item['channelName']}, Type : {item['payloadType']}, Message : {item['messageType']}, Status : {item['status']}, Creation : {item['creationTime']}, Edited Date : {item['lastChange']}\n"
-        result_label.config(text=result_text)
+        for item in data:
+            result_text += (
+                f"Produit : {item['id']}\n"
+                f"Prix : {item['channelName']}\n"
+                f"Type : {item['payloadType']}\n"
+                f"Message : {item['messageType']}\n"
+                f"Status : {item['status']}\n"
+                f"Création : {item['creationTime']}\n"
+                f"Dernière modification : {item['lastChange']}\n"
+                "----------------------------------------\n"
+            )
+        result_textbox.delete(1.0, tk.END)
+        result_textbox.insert(tk.END, result_text)
     except Exception as error:
-        print(error)
-        result_label.config(text=f"Error with {str(PrintText)} : {str(error)}")
+        result_textbox.insert(tk.END, f"Erreur : {str(error)}")
 
-#Affichage dans le Frame
-ExtractInputBtn = tk.Button(fenetre, text="Extract Input", command=ExtractIt)
-result_label = tk.Label(fenetre, text="", wraplength=1000)
-Input = tk.Text(fenetre, width=20, height=2)
-GetBtn = tk.Button(fenetre, text="Print", command=PrintText)
-extractBtn = tk.Button(fenetre, text="Extract", command=extract_me)
-QuitBtn = tk.Button(fenetre, text="Quit", command=quit)
-ExtractInputBtn.pack()
-Input.pack()
-GetBtn.pack()
-extractBtn.pack()
-QuitBtn.pack()
-result_label.pack()
+# ---------- UI Layout ----------
 
+# Section Input
+input_frame = tk.LabelFrame(fenetre, text="Input XML File Path or Content", bg="#f4f4f4", padx=10, pady=10)
+input_frame.pack(fill="x", padx=20, pady=10)
+
+input_textbox = tk.Text(input_frame, height=3, font=("Arial", 12))
+input_textbox.pack(fill="x", expand=True)
+
+# Section des boutons
+button_frame = tk.Frame(fenetre, bg="#f4f4f4")
+button_frame.pack(pady=10)
+
+tk.Button(button_frame, text="Extract from 'test.xml'", command=extract_me, width=20, bg="#FFD700").pack(side="left", padx=10)
+tk.Button(button_frame, text="Extract from input", command=extract_from_input, width=20, bg="#90EE90").pack(side="left", padx=10)
+tk.Button(button_frame, text="Show Input Text", command=print_text, width=15).pack(side="left", padx=10)
+tk.Button(button_frame, text="Quit", command=quit_app, width=10, bg="#FF7F7F").pack(side="left", padx=10)
+
+# Section Résultat
+result_frame = tk.LabelFrame(fenetre, text="Results", bg="#f4f4f4", padx=10, pady=10)
+result_frame.pack(fill="both", expand=True, padx=20, pady=10)
+
+result_textbox = tk.Text(result_frame, wrap="word", font=("Courier", 11))
+result_textbox.pack(fill="both", expand=True)
+
+# Lancer l'application
 fenetre.mainloop()
